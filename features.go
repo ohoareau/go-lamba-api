@@ -5,7 +5,7 @@ import (
 	"github.com/ohoareau/gola/features"
 )
 
-func ApplyFeatures(r *chi.Mux, f Features) {
+func applyFeatures(r *chi.Mux, f Features) {
 	if f["logger"] {
 		features.Logger(r)
 	}

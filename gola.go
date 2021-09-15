@@ -8,15 +8,15 @@ import (
 	"github.com/ohoareau/gola/adapters"
 )
 
-func Start(handler ApiGwV2Handler) {
+func start(handler ApiGwV2Handler) {
 	runtime.Start(handler)
 }
 
-func CreateHandler(configure RouterConfigurator, features Features) ApiGwV2Handler {
+func createHandler(configure RouterConfigurator, features Features) ApiGwV2Handler {
 	return func (event events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 		r := chi.NewRouter()
 
-		ApplyFeatures(r, features)
+		applyFeatures(r, features)
 
 		configure(r)
 
@@ -30,5 +30,5 @@ func CreateHandler(configure RouterConfigurator, features Features) ApiGwV2Handl
 
 //goland:noinspection GoUnusedExportedFunction
 func Gola(configure RouterConfigurator, features Features) {
-	Start(CreateHandler(configure, features))
+	start(createHandler(configure, features))
 }
