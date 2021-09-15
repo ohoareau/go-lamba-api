@@ -29,6 +29,6 @@ func createHandler(configure RouterConfigurator, features Features) ApiGwV2Handl
 }
 
 //goland:noinspection GoUnusedExportedFunction
-func Gola(configure RouterConfigurator, features Features) {
-	start(createHandler(configure, features))
+func Gola(configure RouterConfigurator, featurize FeaturesCreator) {
+	start(createHandler(configure, featurize()))
 }

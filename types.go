@@ -9,6 +9,8 @@ type ApiGwV2Handler func(event events.APIGatewayV2HTTPRequest) (events.APIGatewa
 
 type RouterConfigurator func(r Router)
 
+type FeaturesCreator func() Features
+
 type FeatureKey string
 type FeatureValue bool
 
