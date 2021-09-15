@@ -1,11 +1,10 @@
 package gola
 
 import (
-	"github.com/go-chi/chi/v5"
 	"github.com/ohoareau/gola/features"
 )
 
-func applyFeatures(r *chi.Mux, f Features) {
+func applyFeatures(r Router, f Features) {
 	if f["logger"] {
 		features.Logger(r)
 	}

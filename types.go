@@ -14,4 +14,4 @@ type FeatureValue bool
 
 type Features map[FeatureKey]FeatureValue
 
-type Router *chi.Mux
+type Router = *chi.Mux
