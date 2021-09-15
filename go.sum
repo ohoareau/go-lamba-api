@@ -1,0 +1,8 @@
+github.com/aws/aws-lambda-go v1.26.0 h1:6ujqBpYF7tdZcBvPIccs98SpeGfrt/UOVEiexfNIdHA=
+github.com/aws/aws-lambda-go v1.26.0/go.mod h1:jJmlefzPfGnckuHdXX7/80O3BvUUi12XOkbv4w9SGLU=
+github.com/awslabs/aws-lambda-go-api-proxy v0.11.0 h1:0BeMGwaoHRtwWa26+cg4+Xd1Tpb9mYWP0NDfu7HNyQk=
+github.com/awslabs/aws-lambda-go-api-proxy v0.11.0/go.mod h1:Epon214ULEemdKoA+Vp1D+qKfPKpjPTjH9f1Syo/CDk=
+github.com/go-chi/chi/v5 v5.0.2 h1:4xKeALZdMEsuI5s05PU2Bm89Uc5iM04qFubUCl5LfAQ=
+github.com/go-chi/chi/v5 v5.0.2/go.mod h1:DslCQbL2OYiznFReuXYUmQ2hGd1aDpCnlMNITLSKoi8=
+github.com/go-chi/cors v1.2.0 h1:tV1g1XENQ8ku4Bq3K9ub2AtgG+p16SmzeMSGTwrOKdE=
+github.com/go-chi/cors v1.2.0/go.mod h1:sSbTewc+6wYHBBCW7ytsFSn836hqM7JxpglAy2Vzc58=
