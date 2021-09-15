@@ -15,10 +15,10 @@ func applyFeatures(r Router, f Features) {
 		features.Cors(r)
 	}
 	if f["ping"] {
-		features.Ping(r);
+		features.Ping(r)
 	}
 	if f["root"] {
-		features.Root(r);
+		features.Root(r)
 	}
 	if f["profiler"] {
 		features.Profiler(r)

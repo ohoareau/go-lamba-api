@@ -10,7 +10,7 @@ arch:
 	@echo $(shell go env GOOS)-$(shell go env GOARCH)
 
 format:
-	@gofmt *.go
+	@gofmt -w *.go
 
 install:
 	@go mod vendor

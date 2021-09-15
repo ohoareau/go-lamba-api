@@ -13,7 +13,7 @@ func start(handler ApiGwV2Handler) {
 }
 
 func createHandler(configure RouterConfigurator, features Features) ApiGwV2Handler {
-	return func (event events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+	return func(event events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 		r := chi.NewRouter()
 
 		applyFeatures(r, features)
