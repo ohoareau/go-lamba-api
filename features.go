@@ -17,16 +17,19 @@ func applyFeatures(r Router, f Features) {
 	if f["ping"] {
 		features.Ping(r)
 	}
-	if f["root"] {
-		features.Root(r)
+	if f["jwtauth"] {
+		features.JwtAuth(r)
 	}
 	if f["profiler"] {
 		features.Profiler(r)
 	}
+
+	// these features add routes and must be executed after all the features that add middlewares
+
+	if f["root"] {
+		features.Root(r)
+	}
 	if f["notfound"] {
 		features.Notfound(r)
-	}
-	if f["jwtauth"] {
-		features.JwtAuth(r)
 	}
 }
