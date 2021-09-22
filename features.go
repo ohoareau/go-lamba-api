@@ -26,4 +26,7 @@ func applyFeatures(r Router, f Features) {
 	if f["notfound"] {
 		features.Notfound(r)
 	}
+	if f["jwtauth"] {
+		features.JwtAuth(r)
+	}
 }
