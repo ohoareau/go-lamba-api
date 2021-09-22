@@ -15,6 +15,9 @@ format:
 install:
 	@go mod vendor
 
+update-dependencies:
+	@go mod tidy -v
+
 test:
 	@go test *.go
 
