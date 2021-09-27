@@ -20,7 +20,11 @@ func startLocal(r Router) {
 	if !hasPort {
 		port = "6000"
 	}
-	err := http.ListenAndServe(":" + port, r)
+
+	address := ":" + port
+	url := "http://localhost" + address
+	fmt.Println("🚀 Server ready at " + url)
+	err := http.ListenAndServe(address, r)
 
 	if nil != err {
 		fmt.Println(err.Error())
