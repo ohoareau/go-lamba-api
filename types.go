@@ -17,3 +17,8 @@ type FeatureValue bool
 type Features map[FeatureKey]FeatureValue
 
 type Router = *chi.Mux
+
+type Options struct {
+	Configure RouterConfigurator
+	Features  Features
+}
