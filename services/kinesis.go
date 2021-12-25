@@ -34,19 +34,26 @@ func CreateKinesisRouter(options common.Options) common.KinesisRouter {
 	return r
 }
 
-type BeforeRecordsFunc func(event events.KinesisEvent, ctx context.Context) error
-type BeforeRecordFunc func(info common.KinesisRecordInfo) (common.KinesisRecordInfo, error)
-type AfterRecordFunc func(result HandlerRecordResult, info common.KinesisRecordInfo) (HandlerRecordResult, error)
-type AfterRecordsFunc func(results []HandlerRecordResult, event events.KinesisEvent, ctx context.Context) (interface{}, error)
-
 type KinesisRouter struct {
 	Routes        map[string]common.KinesisRouteHandler
-	BeforeRecords BeforeRecordsFunc
-	BeforeRecord  BeforeRecordFunc
-	AfterRecord   AfterRecordFunc
-	AfterRecords  AfterRecordsFunc
+	BeforeRecords common.KinesisRouterBeforeRecordsFunc
+	BeforeRecord  common.KinesisRouterBeforeRecordFunc
+	AfterRecord   common.KinesisRouterAfterRecordFunc
+	AfterRecords  common.KinesisRouterAfterRecordsFunc
 }
 
+func (r KinesisRouter) RegisterBeforeRecordsFunction(f common.KinesisRouterBeforeRecordsFunc) {
+	r.BeforeRecords = f
+}
+func (r KinesisRouter) RegisterBeforeRecordFunction(f common.KinesisRouterBeforeRecordFunc) {
+	r.BeforeRecord = f
+}
+func (r KinesisRouter) RegisterAfterRecordsFunction(f common.KinesisRouterAfterRecordsFunc) {
+	r.AfterRecords = f
+}
+func (r KinesisRouter) RegisterAfterRecordFunction(f common.KinesisRouterAfterRecordFunc) {
+	r.AfterRecord = f
+}
 func (r KinesisRouter) AddRoute(selector string, handler common.KinesisRouteHandler) {
 	r.Routes[selector] = handler
 }
@@ -80,11 +87,6 @@ func (r KinesisRouter) HandleRecord(info common.KinesisRecordInfo) (interface{},
 
 }
 
-type HandlerRecordResult struct {
-	Result interface{}
-	Error  error
-}
-
 func (r KinesisRouter) Handle(event events.KinesisEvent, ctx context.Context) (interface{}, error) {
 	var err error
 
@@ -94,9 +96,9 @@ func (r KinesisRouter) Handle(event events.KinesisEvent, ctx context.Context) (i
 			return nil, err
 		}
 	}
-	var rrs []HandlerRecordResult
+	var rrs []common.KinesisRouterHandlerRecordResult
 	var info common.KinesisRecordInfo
-	var result HandlerRecordResult
+	var result common.KinesisRouterHandlerRecordResult
 	for i, record := range event.Records {
 		info = common.KinesisRecordInfo{
 			RecordIndex: i,
@@ -107,7 +109,7 @@ func (r KinesisRouter) Handle(event events.KinesisEvent, ctx context.Context) (i
 		if nil != r.BeforeRecord {
 			info, err = r.BeforeRecord(info)
 			if nil != err {
-				rrs = append(rrs, HandlerRecordResult{
+				rrs = append(rrs, common.KinesisRouterHandlerRecordResult{
 					Result: nil,
 					Error:  err,
 				})
@@ -115,14 +117,14 @@ func (r KinesisRouter) Handle(event events.KinesisEvent, ctx context.Context) (i
 			}
 		}
 		rr, err := r.HandleRecord(info)
-		result = HandlerRecordResult{
+		result = common.KinesisRouterHandlerRecordResult{
 			Result: rr,
 			Error:  err,
 		}
 		if nil != r.AfterRecord {
 			result, err = r.AfterRecord(result, info)
 			if nil != err {
-				rrs = append(rrs, HandlerRecordResult{
+				rrs = append(rrs, common.KinesisRouterHandlerRecordResult{
 					Result: result,
 					Error:  err,
 				})

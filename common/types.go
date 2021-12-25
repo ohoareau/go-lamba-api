@@ -30,6 +30,10 @@ type S3Router = interface{}
 type KinesisRouter interface {
 	Handle(event events.KinesisEvent, ctx context.Context) (interface{}, error)
 	AddRoute(selector string, route KinesisRouteHandler)
+	RegisterBeforeRecordsFunction(f KinesisRouterBeforeRecordsFunc)
+	RegisterBeforeRecordFunction(f KinesisRouterBeforeRecordFunc)
+	RegisterAfterRecordsFunction(f KinesisRouterAfterRecordsFunc)
+	RegisterAfterRecordFunction(f KinesisRouterAfterRecordFunc)
 }
 type DynamodbRouter = interface{}
 
@@ -50,4 +54,14 @@ type Options struct {
 	KinesisConfigurator  KinesisConfigurator
 	DynamodbConfigurator DynamodbConfigurator
 	Features             Features
+}
+
+type KinesisRouterBeforeRecordsFunc func(event events.KinesisEvent, ctx context.Context) error
+type KinesisRouterBeforeRecordFunc func(info KinesisRecordInfo) (KinesisRecordInfo, error)
+type KinesisRouterAfterRecordFunc func(result KinesisRouterHandlerRecordResult, info KinesisRecordInfo) (KinesisRouterHandlerRecordResult, error)
+type KinesisRouterAfterRecordsFunc func(results []KinesisRouterHandlerRecordResult, event events.KinesisEvent, ctx context.Context) (interface{}, error)
+
+type KinesisRouterHandlerRecordResult struct {
+	Result interface{}
+	Error  error
 }
