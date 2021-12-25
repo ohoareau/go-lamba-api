@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -53,10 +52,7 @@ func (r KinesisRouter) SelectRouteHandler(info common.KinesisRecordInfo) (common
 	return nil, errors.New("no kinesis route handler found for stream '" + streamName + "'")
 }
 func (r KinesisRouter) ConvertKinesisEventRecordToData(info common.KinesisRecordInfo) ([]byte, error) {
-	log.Println(info.Record)
-	log.Println(info.Record.Kinesis)
-	log.Println(info.Record.Kinesis.Data)
-	return base64.StdEncoding.DecodeString(string(info.Record.Kinesis.Data))
+	return info.Record.Kinesis.Data, nil
 }
 
 func (r KinesisRouter) HandleRecord(info common.KinesisRecordInfo) error {
