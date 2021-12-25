@@ -3,13 +3,11 @@ package services
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/ohoareau/gola/common"
-	"log"
 )
 
-type lambdaHandler func(ctx context.Context, payload []byte) ([]byte, error)
+type lambdaHandler func(ctx context.Context, payload []byte) (interface{}, error)
 
 // Invoke calls the handler, and serializes the response.
 // If the underlying handler returned an error, or an error occurs during serialization, error is returned.
@@ -28,39 +26,26 @@ func (handler lambdaHandler) Invoke(ctx context.Context, payload []byte) ([]byte
 }
 
 func CreateHandler(options common.Options) lambda.Handler {
-	return lambdaHandler(func(ctx context.Context, payload []byte) ([]byte, error) {
+	return lambdaHandler(func(ctx context.Context, payload []byte) (interface{}, error) {
 		mode := detectModeFromPayload(payload)
-		log.Println(mode)
-		var r interface{}
-		var err error
 		switch mode {
 		case "apigw2":
-			r, err = HandleApiGatewayV2Event(ConvertPayloadToApiGatewayV2Event(payload), ctx, options)
+			return HandleApiGatewayV2Event(ConvertPayloadToApiGatewayV2Event(payload), ctx, options)
 		case "kinesis":
-			r, err = HandleKinesisEvent(ConvertPayloadToKinesisEvent(payload), ctx, options)
+			return HandleKinesisEvent(ConvertPayloadToKinesisEvent(payload), ctx, options)
 		case "apigw1":
-			r, err = HandleApiGatewayV1Event(ConvertPayloadToApiGatewayV1Event(payload), ctx, options)
+			return HandleApiGatewayV1Event(ConvertPayloadToApiGatewayV1Event(payload), ctx, options)
 		case "sqs":
-			r, err = HandleSqsEvent(ConvertPayloadToSqsEvent(payload), ctx, options)
+			return HandleSqsEvent(ConvertPayloadToSqsEvent(payload), ctx, options)
 		case "s3":
-			r, err = HandleS3Event(ConvertPayloadToS3Event(payload), ctx, options)
+			return HandleS3Event(ConvertPayloadToS3Event(payload), ctx, options)
 		case "dynamodb":
-			r, err = HandleDynamoDBEvent(ConvertPayloadToDynamoDBEvent(payload), ctx, options)
+			return HandleDynamoDBEvent(ConvertPayloadToDynamoDBEvent(payload), ctx, options)
 		case "sns":
-			r, err = HandleSnsEvent(ConvertPayloadToSnsEvent(payload), ctx, options)
+			return HandleSnsEvent(ConvertPayloadToSnsEvent(payload), ctx, options)
 		default:
-			r, err = HandleApiGatewayV2Event(ConvertPayloadToApiGatewayV2Event(payload), ctx, options)
+			return HandleApiGatewayV2Event(ConvertPayloadToApiGatewayV2Event(payload), ctx, options)
 		}
-		var output []byte
-		if nil != err {
-			fmt.Println(err)
-		} else {
-			output, err = json.Marshal(r)
-			if nil != err {
-				fmt.Println(err)
-			}
-		}
-		return output, err
 	})
 }
 
