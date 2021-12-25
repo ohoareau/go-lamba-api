@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/go-chi/chi/v5"
 )
@@ -26,9 +27,20 @@ type HttpRouter = *chi.Mux
 type SnsRouter = interface{}
 type SqsRouter = interface{}
 type S3Router = interface{}
-type KinesisRouter = interface{}
+type KinesisRouter interface {
+	Handle(event events.KinesisEvent, ctx context.Context) (interface{}, error)
+	AddRoute(selector string, route KinesisRouteHandler)
+}
 type DynamodbRouter = interface{}
 
+type KinesisRecordInfo struct {
+	RecordIndex int
+	Record      events.KinesisEventRecord
+	Event       events.KinesisEvent
+	Context     context.Context
+}
+
+type KinesisRouteHandler func(data interface{}, info KinesisRecordInfo) (interface{}, error)
 type Options struct {
 	Apigw2Configurator   Apigw2Configurator
 	Apigw1Configurator   Apigw1Configurator

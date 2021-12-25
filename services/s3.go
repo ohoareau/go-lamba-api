@@ -12,7 +12,7 @@ func ConvertPayloadToS3Event(payload []byte) events.S3Event {
 	var event events.S3Event
 	err := json.Unmarshal(payload, &event)
 	if nil != err {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 	}
 	return event
 }

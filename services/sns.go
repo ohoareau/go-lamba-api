@@ -12,7 +12,7 @@ func ConvertPayloadToSnsEvent(payload []byte) events.SNSEvent {
 	var event events.SNSEvent
 	err := json.Unmarshal(payload, &event)
 	if nil != err {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 	}
 	return event
 }

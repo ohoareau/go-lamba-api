@@ -14,7 +14,7 @@ func ConvertPayloadToApiGatewayV2Event(payload []byte) events.APIGatewayV2HTTPRe
 	var event events.APIGatewayV2HTTPRequest
 	err := json.Unmarshal(payload, &event)
 	if nil != err {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 	}
 	return event
 }
@@ -23,14 +23,14 @@ func ConvertPayloadToApiGatewayV1Event(payload []byte) events.APIGatewayProxyReq
 	var event events.APIGatewayProxyRequest
 	err := json.Unmarshal(payload, &event)
 	if nil != err {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 	}
 	return event
 }
 
 //goland:noinspection GoUnusedParameter
-func HandleApiGatewayV2Event(event events.APIGatewayV2HTTPRequest, ctx interface{}, options common.Options) (events.APIGatewayV2HTTPResponse, error) {
-	return adapters.CreateChiAdapter(CreateHttpRouter(options)).ProxyWithContext(context.Background(), event)
+func HandleApiGatewayV2Event(event events.APIGatewayV2HTTPRequest, ctx context.Context, options common.Options) (events.APIGatewayV2HTTPResponse, error) {
+	return adapters.CreateChiAdapter(CreateHttpRouter(options)).ProxyWithContext(ctx, event)
 }
 
 //goland:noinspection GoUnusedParameter

@@ -12,7 +12,7 @@ func ConvertPayloadToDynamoDBEvent(payload []byte) events.DynamoDBEvent {
 	var event events.DynamoDBEvent
 	err := json.Unmarshal(payload, &event)
 	if nil != err {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 	}
 	return event
 }

@@ -12,7 +12,7 @@ func ConvertPayloadToSqsEvent(payload []byte) events.SQSEvent {
 	var event events.SQSEvent
 	err := json.Unmarshal(payload, &event)
 	if nil != err {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 	}
 	return event
 }
