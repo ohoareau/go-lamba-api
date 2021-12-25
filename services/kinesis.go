@@ -27,7 +27,7 @@ func HandleKinesisEvent(event events.KinesisEvent, ctx context.Context, options 
 }
 
 func CreateKinesisRouter(options common.Options) common.KinesisRouter {
-	var r common.KinesisRouter
+	var r KinesisRouter = map[string]common.KinesisRouteHandler{}
 	if nil != options.KinesisConfigurator {
 		options.KinesisConfigurator(r)
 	}
