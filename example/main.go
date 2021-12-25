@@ -2,22 +2,26 @@ package main
 
 import (
 	"github.com/ohoareau/gola"
+	"github.com/ohoareau/gola/common"
 	"net/http"
 )
 
 func main() {
-	gola.Gola(configure, featurize)
+	gola.Main(common.Options{
+		Apigw2Configurator: configure,
+		Features:           featurize(),
+	})
 }
 
-func configure(r gola.Router) {
+func configure(r common.HttpRouter) {
 	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(200)
 		writer.Write([]byte("Hello!"))
 	})
 }
 
-func featurize() gola.Features {
-	return gola.Features{
+func featurize() common.Features {
+	return common.Features{
 		"logger":    true,
 		"recoverer": true,
 		"cors":      true,

@@ -9,3 +9,8 @@ func GetEnvVar(name string, defaultValue string) string {
 	}
 	return value
 }
+
+func HasEnvVar(name string) bool {
+	_, found := os.LookupEnv(name)
+	return found
+}

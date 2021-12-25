@@ -12,6 +12,6 @@ func JwtAuth(r *chi.Mux) {
 			jwtauth.New(
 				utils.GetEnvVar("JWT_AUTH_ALG", "HS256"),
 				[]byte(utils.GetEnvVar("JWT_AUTH_SECRET", "MySEcret2021!")),
-			 nil)))
+				nil)))
 	r.Use(jwtauth.Authenticator)
 }
