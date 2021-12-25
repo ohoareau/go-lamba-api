@@ -18,7 +18,7 @@ func ConvertPayloadToS3Event(payload []byte) events.S3Event {
 }
 
 //goland:noinspection GoUnusedParameter
-func HandleS3Event(event events.S3Event, ctx interface{}, options common.Options) (interface{}, error) {
+func HandleS3Event(event events.S3Event, ctx interface{}, options *common.Options) (interface{}, error) {
 	for _, r := range event.Records {
 		log.Println(r)
 	}

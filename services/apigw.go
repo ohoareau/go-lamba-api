@@ -29,12 +29,12 @@ func ConvertPayloadToApiGatewayV1Event(payload []byte) events.APIGatewayProxyReq
 }
 
 //goland:noinspection GoUnusedParameter
-func HandleApiGatewayV2Event(event events.APIGatewayV2HTTPRequest, ctx context.Context, options common.Options) (events.APIGatewayV2HTTPResponse, error) {
+func HandleApiGatewayV2Event(event events.APIGatewayV2HTTPRequest, ctx context.Context, options *common.Options) (events.APIGatewayV2HTTPResponse, error) {
 	return adapters.CreateChiAdapter(CreateHttpRouter(options)).ProxyWithContext(ctx, event)
 }
 
 //goland:noinspection GoUnusedParameter
-func HandleApiGatewayV1Event(event events.APIGatewayProxyRequest, ctx interface{}, options common.Options) (events.APIGatewayProxyResponse, error) {
+func HandleApiGatewayV1Event(event events.APIGatewayProxyRequest, ctx interface{}, options *common.Options) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
 		StatusCode: 500,
 	}, errors.New("gola not yet implemented: ApiGatewayV1 Event handler")

@@ -8,26 +8,20 @@ import (
 
 func main() {
 	gola.Main(common.Options{
-		Apigw2Configurator: configure,
-		Features:           featurize(),
+		Apigw2Configurator: func(r *common.HttpRouter) {
+			r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
+				writer.WriteHeader(200)
+				writer.Write([]byte("Hello!"))
+			})
+		},
+		Features: common.Features{
+			"logger":    true,
+			"recoverer": true,
+			"cors":      true,
+			"ping":      true,
+			"root":      true,
+			"profiler":  true,
+			"notfound":  true,
+		},
 	})
-}
-
-func configure(r common.HttpRouter) {
-	r.Get("/", func(writer http.ResponseWriter, request *http.Request) {
-		writer.WriteHeader(200)
-		writer.Write([]byte("Hello!"))
-	})
-}
-
-func featurize() common.Features {
-	return common.Features{
-		"logger":    true,
-		"recoverer": true,
-		"cors":      true,
-		"ping":      true,
-		"root":      true,
-		"profiler":  true,
-		"notfound":  true,
-	}
 }

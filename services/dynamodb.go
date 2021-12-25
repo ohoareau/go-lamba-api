@@ -18,7 +18,7 @@ func ConvertPayloadToDynamoDBEvent(payload []byte) events.DynamoDBEvent {
 }
 
 //goland:noinspection GoUnusedParameter
-func HandleDynamoDBEvent(event events.DynamoDBEvent, ctx interface{}, options common.Options) (interface{}, error) {
+func HandleDynamoDBEvent(event events.DynamoDBEvent, ctx interface{}, options *common.Options) (interface{}, error) {
 	for _, r := range event.Records {
 		log.Println(r)
 	}

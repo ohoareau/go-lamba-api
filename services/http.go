@@ -6,7 +6,7 @@ import (
 	"github.com/ohoareau/gola/features"
 )
 
-func CreateHttpRouter(options common.Options) common.HttpRouter {
+func CreateHttpRouter(options *common.Options) *common.HttpRouter {
 	r := chi.NewRouter()
 
 	applyHttpFeatures(r, options.Features)
@@ -21,7 +21,7 @@ func CreateHttpRouter(options common.Options) common.HttpRouter {
 	return r
 }
 
-func applyHttpFeatures(r common.HttpRouter, f common.Features) {
+func applyHttpFeatures(r *common.HttpRouter, f common.Features) {
 	if f["logger"] {
 		features.Logger(r)
 	}

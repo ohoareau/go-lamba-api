@@ -14,7 +14,7 @@ func Main(options common.Options) {
 	if !utils.HasEnvVar("AWS_LAMBDA_FUNCTION_NAME") {
 		port := utils.GetEnvVar("PORT", "5000")
 		fmt.Println("🚀 Server ready at " + "http://localhost:" + port)
-		err := http.ListenAndServe(":"+port, services.CreateHttpRouter(options))
+		err := http.ListenAndServe(":"+port, services.CreateHttpRouter(&options))
 		if nil != err {
 			fmt.Println(err.Error())
 			os.Exit(1)
@@ -22,5 +22,5 @@ func Main(options common.Options) {
 		os.Exit(0)
 	}
 
-	runtime.StartHandler(services.CreateHandler(options))
+	runtime.StartHandler(services.CreateHandler(&options))
 }

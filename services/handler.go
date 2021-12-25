@@ -25,7 +25,7 @@ func (handler lambdaHandler) Invoke(ctx context.Context, payload []byte) ([]byte
 	return responseBytes, nil
 }
 
-func CreateHandler(options common.Options) lambda.Handler {
+func CreateHandler(options *common.Options) lambda.Handler {
 	return lambdaHandler(func(ctx context.Context, payload []byte) (interface{}, error) {
 		mode := detectModeFromPayload(payload)
 		switch mode {

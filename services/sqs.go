@@ -18,7 +18,7 @@ func ConvertPayloadToSqsEvent(payload []byte) events.SQSEvent {
 }
 
 //goland:noinspection GoUnusedParameter
-func HandleSqsEvent(event events.SQSEvent, ctx interface{}, options common.Options) (interface{}, error) {
+func HandleSqsEvent(event events.SQSEvent, ctx interface{}, options *common.Options) (interface{}, error) {
 	for _, r := range event.Records {
 		log.Println(r)
 	}

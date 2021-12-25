@@ -18,7 +18,7 @@ func ConvertPayloadToSnsEvent(payload []byte) events.SNSEvent {
 }
 
 //goland:noinspection GoUnusedParameter
-func HandleSnsEvent(event events.SNSEvent, ctx interface{}, options common.Options) (interface{}, error) {
+func HandleSnsEvent(event events.SNSEvent, ctx interface{}, options *common.Options) (interface{}, error) {
 	for _, r := range event.Records {
 		log.Println(r)
 	}
