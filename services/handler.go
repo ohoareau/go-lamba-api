@@ -4,11 +4,14 @@ import (
 	"context"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/common"
+	"log"
 )
 
 func CreateHandler(options common.Options) interface{} {
 	return func(ctx context.Context, event interface{}) (interface{}, error) {
 		mode := detectModeFromEvent(event)
+		log.Println(event)
+		log.Println(mode)
 		switch mode {
 		case "apigw2":
 			return HandleApiGatewayV2Event(event.(events.APIGatewayV2HTTPRequest), ctx, options)
