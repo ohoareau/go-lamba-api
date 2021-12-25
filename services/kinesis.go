@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/common"
-	"log"
 	"strings"
 )
 
@@ -26,26 +25,39 @@ func HandleKinesisEvent(event events.KinesisEvent, ctx context.Context, options 
 }
 
 func CreateKinesisRouter(options common.Options) common.KinesisRouter {
-	var r KinesisRouter = map[string]common.KinesisRouteHandler{}
+	r := KinesisRouter{
+		Routes: map[string]common.KinesisRouteHandler{},
+	}
 	if nil != options.KinesisConfigurator {
 		options.KinesisConfigurator(r)
 	}
 	return r
 }
 
-type KinesisRouter map[string]common.KinesisRouteHandler
+type BeforeRecordsFunc func(event events.KinesisEvent, ctx context.Context) error
+type BeforeRecordFunc func(info common.KinesisRecordInfo) (common.KinesisRecordInfo, error)
+type AfterRecordFunc func(result HandlerRecordResult, info common.KinesisRecordInfo) (HandlerRecordResult, error)
+type AfterRecordsFunc func(results []HandlerRecordResult, event events.KinesisEvent, ctx context.Context) (interface{}, error)
+
+type KinesisRouter struct {
+	Routes        map[string]common.KinesisRouteHandler
+	BeforeRecords BeforeRecordsFunc
+	BeforeRecord  BeforeRecordFunc
+	AfterRecord   AfterRecordFunc
+	AfterRecords  AfterRecordsFunc
+}
 
 func (r KinesisRouter) AddRoute(selector string, handler common.KinesisRouteHandler) {
-	r[selector] = handler
+	r.Routes[selector] = handler
 }
 
 func (r KinesisRouter) SelectRouteHandler(info common.KinesisRecordInfo) (common.KinesisRouteHandler, error) {
 	streamName := info.Record.EventSourceArn[:strings.LastIndex(info.Record.EventSourceArn, "/")]
-	v, found := r[streamName]
+	v, found := r.Routes[streamName]
 	if found {
 		return v, nil
 	}
-	v, found = r["*"]
+	v, found = r.Routes["*"]
 	if found {
 		return v, nil
 	}
@@ -55,31 +67,72 @@ func (r KinesisRouter) ConvertKinesisEventRecordToData(info common.KinesisRecord
 	return info.Record.Kinesis.Data, nil
 }
 
-func (r KinesisRouter) HandleRecord(info common.KinesisRecordInfo) error {
+func (r KinesisRouter) HandleRecord(info common.KinesisRecordInfo) (interface{}, error) {
 	handler, err := r.SelectRouteHandler(info)
 	if nil != err {
-		return err
+		return nil, err
 	}
 	data, err := r.ConvertKinesisEventRecordToData(info)
 	if nil != err {
-		return err
+		return nil, err
 	}
-	_, err = handler(data, info)
-	return err
+	return handler(data, info)
 
 }
+
+type HandlerRecordResult struct {
+	Result interface{}
+	Error  error
+}
+
 func (r KinesisRouter) Handle(event events.KinesisEvent, ctx context.Context) (interface{}, error) {
 	var err error
+
+	if nil != r.BeforeRecords {
+		err = r.BeforeRecords(event, ctx)
+		if nil != err {
+			return nil, err
+		}
+	}
+	var rrs []HandlerRecordResult
+	var info common.KinesisRecordInfo
+	var result HandlerRecordResult
 	for i, record := range event.Records {
-		err = r.HandleRecord(common.KinesisRecordInfo{
+		info = common.KinesisRecordInfo{
 			RecordIndex: i,
 			Record:      record,
 			Context:     ctx,
 			Event:       event,
-		})
-		if nil != err {
-			log.Println(i, err)
 		}
+		if nil != r.BeforeRecord {
+			info, err = r.BeforeRecord(info)
+			if nil != err {
+				rrs = append(rrs, HandlerRecordResult{
+					Result: nil,
+					Error:  err,
+				})
+				continue
+			}
+		}
+		rr, err := r.HandleRecord(info)
+		result = HandlerRecordResult{
+			Result: rr,
+			Error:  err,
+		}
+		if nil != r.AfterRecord {
+			result, err = r.AfterRecord(result, info)
+			if nil != err {
+				rrs = append(rrs, HandlerRecordResult{
+					Result: result,
+					Error:  err,
+				})
+				continue
+			}
+		}
+		rrs = append(rrs, result)
 	}
-	return nil, nil
+	if nil != r.AfterRecords {
+		return r.AfterRecords(rrs, event, ctx)
+	}
+	return rrs, err
 }
