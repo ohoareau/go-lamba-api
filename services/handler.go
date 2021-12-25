@@ -1,12 +1,13 @@
 package services
 
 import (
+	"context"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/common"
 )
 
 func CreateHandler(options common.Options) interface{} {
-	return func(ctx interface{}, event interface{}) (interface{}, error) {
+	return func(ctx context.Context, event interface{}) (interface{}, error) {
 		mode := detectModeFromEvent(event)
 		switch mode {
 		case "apigw2":
