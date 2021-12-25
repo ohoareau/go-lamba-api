@@ -1,18 +1,20 @@
 package services
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/common"
 	"log"
 )
 
-func IsSnsEvent(event interface{}) bool {
-	switch event.(type) {
-	case events.SNSEvent:
-		return true
-	default:
-		return false
+func ConvertPayloadToSnsEvent(payload []byte) events.SNSEvent {
+	var event events.SNSEvent
+	err := json.Unmarshal(payload, &event)
+	if nil != err {
+		fmt.Println(err)
 	}
+	return event
 }
 
 //goland:noinspection GoUnusedParameter

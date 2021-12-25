@@ -1,18 +1,20 @@
 package services
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/common"
 	"log"
 )
 
-func IsS3Event(event interface{}) bool {
-	switch event.(type) {
-	case events.S3Event:
-		return true
-	default:
-		return false
+func ConvertPayloadToS3Event(payload []byte) events.S3Event {
+	var event events.S3Event
+	err := json.Unmarshal(payload, &event)
+	if nil != err {
+		fmt.Println(err)
 	}
+	return event
 }
 
 //goland:noinspection GoUnusedParameter

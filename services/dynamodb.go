@@ -1,18 +1,20 @@
 package services
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/common"
 	"log"
 )
 
-func IsDynamoDBEvent(event interface{}) bool {
-	switch event.(type) {
-	case events.DynamoDBEvent:
-		return true
-	default:
-		return false
+func ConvertPayloadToDynamoDBEvent(payload []byte) events.DynamoDBEvent {
+	var event events.DynamoDBEvent
+	err := json.Unmarshal(payload, &event)
+	if nil != err {
+		fmt.Println(err)
 	}
+	return event
 }
 
 //goland:noinspection GoUnusedParameter

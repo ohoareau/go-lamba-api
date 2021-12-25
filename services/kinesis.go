@@ -1,18 +1,20 @@
 package services
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/common"
 	"log"
 )
 
-func IsKinesisEvent(event interface{}) bool {
-	switch event.(type) {
-	case events.KinesisEvent:
-		return true
-	default:
-		return false
+func ConvertPayloadToKinesisEvent(payload []byte) events.KinesisEvent {
+	var event events.KinesisEvent
+	err := json.Unmarshal(payload, &event)
+	if nil != err {
+		fmt.Println(err)
 	}
+	return event
 }
 
 //goland:noinspection GoUnusedParameter

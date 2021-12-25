@@ -22,5 +22,5 @@ func Main(options common.Options) {
 		os.Exit(0)
 	}
 
-	runtime.Start(services.CreateHandler(options))
+	runtime.StartHandler(services.CreateHandler(options))
 }

@@ -2,58 +2,119 @@ package services
 
 import (
 	"context"
-	"github.com/aws/aws-lambda-go/events"
+	"encoding/json"
+	"fmt"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/ohoareau/gola/common"
 	"log"
 )
 
-func CreateHandler(options common.Options) interface{} {
-	return func(ctx context.Context, event interface{}) (interface{}, error) {
-		mode := detectModeFromEvent(event)
-		log.Println(event)
-		log.Println(mode)
-		switch mode {
-		case "apigw2":
-			return HandleApiGatewayV2Event(event.(events.APIGatewayV2HTTPRequest), ctx, options)
-		case "kinesis":
-			return HandleKinesisEvent(event.(events.KinesisEvent), ctx, options)
-		case "apigw1":
-			return HandleApiGatewayV1Event(event.(events.APIGatewayProxyRequest), ctx, options)
-		case "sqs":
-			return HandleSqsEvent(event.(events.SQSEvent), ctx, options)
-		case "s3":
-			return HandleS3Event(event.(events.S3Event), ctx, options)
-		case "dynamodb":
-			return HandleDynamoDBEvent(event.(events.DynamoDBEvent), ctx, options)
-		case "sns":
-			return HandleSnsEvent(event.(events.SNSEvent), ctx, options)
-		default:
-			return HandleApiGatewayV2Event(event.(events.APIGatewayV2HTTPRequest), ctx, options)
-		}
+type lambdaHandler func(ctx context.Context, payload []byte) ([]byte, error)
+
+// Invoke calls the handler, and serializes the response.
+// If the underlying handler returned an error, or an error occurs during serialization, error is returned.
+func (handler lambdaHandler) Invoke(ctx context.Context, payload []byte) ([]byte, error) {
+	response, err := handler(ctx, payload)
+	if err != nil {
+		return nil, err
 	}
+
+	responseBytes, err := json.Marshal(response)
+	if err != nil {
+		return nil, err
+	}
+
+	return responseBytes, nil
 }
 
-func detectModeFromEvent(event interface{}) string {
-	if IsApiGatewayV2Event(event) {
-		return "apigw2"
+func CreateHandler(options common.Options) lambda.Handler {
+	return lambdaHandler(func(ctx context.Context, payload []byte) ([]byte, error) {
+		mode := detectModeFromPayload(payload)
+		log.Println(mode)
+		var r interface{}
+		var err error
+		switch mode {
+		case "apigw2":
+			r, err = HandleApiGatewayV2Event(ConvertPayloadToApiGatewayV2Event(payload), ctx, options)
+		case "kinesis":
+			r, err = HandleKinesisEvent(ConvertPayloadToKinesisEvent(payload), ctx, options)
+		case "apigw1":
+			r, err = HandleApiGatewayV1Event(ConvertPayloadToApiGatewayV1Event(payload), ctx, options)
+		case "sqs":
+			r, err = HandleSqsEvent(ConvertPayloadToSqsEvent(payload), ctx, options)
+		case "s3":
+			r, err = HandleS3Event(ConvertPayloadToS3Event(payload), ctx, options)
+		case "dynamodb":
+			r, err = HandleDynamoDBEvent(ConvertPayloadToDynamoDBEvent(payload), ctx, options)
+		case "sns":
+			r, err = HandleSnsEvent(ConvertPayloadToSnsEvent(payload), ctx, options)
+		default:
+			r, err = HandleApiGatewayV2Event(ConvertPayloadToApiGatewayV2Event(payload), ctx, options)
+		}
+		var output []byte
+		if nil != err {
+			fmt.Println(err)
+		} else {
+			output, err = json.Marshal(r)
+			if nil != err {
+				fmt.Println(err)
+			}
+		}
+		return output, err
+	})
+}
+
+type BasicBulkEventRecord struct {
+	EventSource1 string `json:"EventSource"`
+	EventSource2 string `json:"eventSource"`
+}
+
+type BulkEvent struct {
+	Records []BasicBulkEventRecord `json:"records"`
+}
+
+type SingleEvent struct {
+	Version string `json:"version"`
+}
+
+func detectModeFromPayload(payload []byte) string {
+	var bulkEvent BulkEvent
+	isBulkEvent := false
+	err := json.Unmarshal(payload, &bulkEvent)
+	if nil == err && (0 < len(bulkEvent.Records)) {
+		isBulkEvent = true
 	}
-	if IsKinesisEvent(event) {
-		return "kinesis"
+	if isBulkEvent {
+		if IsBulkEventFromSource(bulkEvent, "aws:kinesis") {
+			return "kinesis"
+		}
+		if IsBulkEventFromSource(bulkEvent, "aws:sqs") {
+			return "sqs"
+		}
+		if IsBulkEventFromSource(bulkEvent, "aws:dynamodb") {
+			return "dynamodb"
+		}
+		if IsBulkEventFromSource(bulkEvent, "aws:s3") {
+			return "s3"
+		}
+		if IsBulkEventFromSource(bulkEvent, "aws:sns") {
+			return "sns"
+		}
+		return "unknown"
 	}
-	if IsSqsEvent(event) {
-		return "sqs"
-	}
-	if IsDynamoDBEvent(event) {
-		return "dynamodb"
-	}
-	if IsS3Event(event) {
-		return "s3"
-	}
-	if IsApiGatewayV1Event(event) {
-		return "apigw1"
-	}
-	if IsSnsEvent(event) {
-		return "sns"
+	var singleEvent SingleEvent
+	err = json.Unmarshal(payload, &singleEvent)
+	if nil == err {
+		if "2.0" == singleEvent.Version {
+			return "apigw2"
+		}
+		if "1.0" == singleEvent.Version {
+			return "apigw1"
+		}
 	}
 	return "unknown"
+}
+
+func IsBulkEventFromSource(bulkEvent BulkEvent, source string) bool {
+	return (source == bulkEvent.Records[0].EventSource1) || (source == bulkEvent.Records[0].EventSource2)
 }

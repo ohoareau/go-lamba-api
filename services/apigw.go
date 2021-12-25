@@ -2,28 +2,30 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/adapters"
 	"github.com/ohoareau/gola/common"
 )
 
-func IsApiGatewayV2Event(event interface{}) bool {
-	switch event.(type) {
-	case events.APIGatewayV2HTTPRequest:
-		return true
-	default:
-		return false
+func ConvertPayloadToApiGatewayV2Event(payload []byte) events.APIGatewayV2HTTPRequest {
+	var event events.APIGatewayV2HTTPRequest
+	err := json.Unmarshal(payload, &event)
+	if nil != err {
+		fmt.Println(err)
 	}
+	return event
 }
 
-func IsApiGatewayV1Event(event interface{}) bool {
-	switch event.(type) {
-	case events.APIGatewayProxyRequest:
-		return true
-	default:
-		return false
+func ConvertPayloadToApiGatewayV1Event(payload []byte) events.APIGatewayProxyRequest {
+	var event events.APIGatewayProxyRequest
+	err := json.Unmarshal(payload, &event)
+	if nil != err {
+		fmt.Println(err)
 	}
+	return event
 }
 
 //goland:noinspection GoUnusedParameter

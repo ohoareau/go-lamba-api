@@ -1,18 +1,20 @@
 package services
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/common"
 	"log"
 )
 
-func IsSqsEvent(event interface{}) bool {
-	switch event.(type) {
-	case events.SQSEvent:
-		return true
-	default:
-		return false
+func ConvertPayloadToSqsEvent(payload []byte) events.SQSEvent {
+	var event events.SQSEvent
+	err := json.Unmarshal(payload, &event)
+	if nil != err {
+		fmt.Println(err)
 	}
+	return event
 }
 
 //goland:noinspection GoUnusedParameter
