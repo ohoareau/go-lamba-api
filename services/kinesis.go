@@ -52,7 +52,7 @@ func (r KinesisRouter) SelectRouteHandler(info common.KinesisRecordInfo) (common
 	}
 	return nil, errors.New("no kinesis route handler found for stream '" + streamName + "'")
 }
-func (r KinesisRouter) ConvertKinesisEventRecordToData(info common.KinesisRecordInfo) (interface{}, error) {
+func (r KinesisRouter) ConvertKinesisEventRecordToData(info common.KinesisRecordInfo) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(string(info.Record.Kinesis.Data))
 }
 

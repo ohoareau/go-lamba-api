@@ -40,7 +40,7 @@ type KinesisRecordInfo struct {
 	Context     context.Context
 }
 
-type KinesisRouteHandler func(data interface{}, info KinesisRecordInfo) (interface{}, error)
+type KinesisRouteHandler func(data []byte, info KinesisRecordInfo) (interface{}, error)
 type Options struct {
 	Apigw2Configurator   Apigw2Configurator
 	Apigw1Configurator   Apigw1Configurator
