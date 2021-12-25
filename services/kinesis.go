@@ -21,11 +21,12 @@ func ConvertPayloadToKinesisEvent(payload []byte) events.KinesisEvent {
 
 //goland:noinspection GoUnusedParameter
 func HandleKinesisEvent(event events.KinesisEvent, ctx context.Context, options common.Options) (interface{}, error) {
-	return CreateKinesisRouter(options).Handle(event, ctx)
+	return (*CreateKinesisRouter(options)).Handle(event, ctx)
 }
 
 func CreateKinesisRouter(options common.Options) common.KinesisRouter {
-	r := KinesisRouter{
+	var r common.KinesisRouter
+	*r = KinesisRouter{
 		Routes: map[string]common.KinesisRouteHandler{},
 	}
 	if nil != options.KinesisConfigurator {

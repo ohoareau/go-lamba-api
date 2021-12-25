@@ -27,7 +27,8 @@ type HttpRouter = *chi.Mux
 type SnsRouter = interface{}
 type SqsRouter = interface{}
 type S3Router = interface{}
-type KinesisRouter interface {
+type KinesisRouter = *KinesisProcessor
+type KinesisProcessor interface {
 	Handle(event events.KinesisEvent, ctx context.Context) (interface{}, error)
 	AddRoute(selector string, route KinesisRouteHandler)
 	RegisterBeforeRecordsFunction(f KinesisRouterBeforeRecordsFunc)
