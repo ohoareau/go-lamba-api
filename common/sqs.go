@@ -42,7 +42,7 @@ type SqsRecordInfo struct {
 	Context     context.Context
 }
 
-type SqsRouteHandler func(data []byte, info SqsRecordInfo) (interface{}, error)
+type SqsRouteHandler func(data []byte, info SqsRecordInfo, queueName string) (interface{}, error)
 
 type SqsRouterBeforeRecordsFunc func(event events.SQSEvent, ctx context.Context) error
 type SqsRouterBeforeRecordFunc func(info SqsRecordInfo) (SqsRecordInfo, error)
@@ -59,7 +59,7 @@ func (r *SqsRouter) ConvertSqsEventRecordToData(info SqsRecordInfo) ([]byte, err
 }
 
 func (r *SqsRouter) HandleRecord(info SqsRecordInfo) (interface{}, error) {
-	handler, err := r.SelectRouteHandler(info)
+	handler, queueName, err := r.SelectRouteHandler(info)
 	if nil != err {
 		return nil, err
 	}
@@ -67,21 +67,21 @@ func (r *SqsRouter) HandleRecord(info SqsRecordInfo) (interface{}, error) {
 	if nil != err {
 		return nil, err
 	}
-	return handler(data, info)
+	return handler(data, info, queueName)
 
 }
 
-func (r *SqsRouter) SelectRouteHandler(info SqsRecordInfo) (SqsRouteHandler, error) {
-	queueName := info.Record.EventSourceARN[:strings.LastIndex(info.Record.EventSourceARN, ":")]
+func (r *SqsRouter) SelectRouteHandler(info SqsRecordInfo) (SqsRouteHandler, string, error) {
+	queueName := info.Record.EventSourceARN[strings.LastIndex(info.Record.EventSourceARN, ":")+1:]
 	v, found := r.Routes[queueName]
 	if found {
-		return v, nil
+		return v, queueName, nil
 	}
 	v, found = r.Routes["*"]
 	if found {
-		return v, nil
+		return v, queueName, nil
 	}
-	return nil, errors.New("no sqs route handler found for queue '" + queueName + "'")
+	return nil, queueName, errors.New("no sqs route handler found for queue '" + queueName + "'")
 }
 
 func (r *SqsRouter) Handle(event events.SQSEvent, ctx context.Context) (interface{}, error) {
