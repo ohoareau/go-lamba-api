@@ -16,6 +16,16 @@ type Features map[string]bool
 
 type HttpRouter = chi.Mux
 type SnsRouter interface{}
-type SqsRouter interface{}
 type S3Router interface{}
 type DynamodbRouter interface{}
+
+type Options struct {
+	Apigw2Configurator   Apigw2Configurator
+	Apigw1Configurator   Apigw1Configurator
+	SnsConfigurator      SnsConfigurator
+	SqsConfigurator      SqsConfigurator
+	S3Configurator       S3Configurator
+	KinesisConfigurator  KinesisConfigurator
+	DynamodbConfigurator DynamodbConfigurator
+	Features             Features
+}

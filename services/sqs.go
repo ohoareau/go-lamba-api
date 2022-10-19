@@ -1,11 +1,11 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ohoareau/gola/common"
-	"log"
 )
 
 func ConvertPayloadToSqsEvent(payload []byte) events.SQSEvent {
@@ -18,9 +18,16 @@ func ConvertPayloadToSqsEvent(payload []byte) events.SQSEvent {
 }
 
 //goland:noinspection GoUnusedParameter
-func HandleSqsEvent(event events.SQSEvent, ctx interface{}, options *common.Options) (interface{}, error) {
-	for _, r := range event.Records {
-		log.Println(r)
+func HandleSqsEvent(event events.SQSEvent, ctx context.Context, options *common.Options) (interface{}, error) {
+	return CreateSqsRouter(options).Handle(event, ctx)
+}
+
+func CreateSqsRouter(options *common.Options) *common.SqsRouter {
+	r := &common.SqsRouter{
+		Routes: map[string]common.SqsRouteHandler{},
 	}
-	return nil, nil
+	if nil != options.SqsConfigurator {
+		options.SqsConfigurator(r)
+	}
+	return r
 }

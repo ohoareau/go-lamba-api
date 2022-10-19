@@ -43,16 +43,6 @@ type KinesisRecordInfo struct {
 }
 
 type KinesisRouteHandler func(data []byte, info KinesisRecordInfo) (interface{}, error)
-type Options struct {
-	Apigw2Configurator   Apigw2Configurator
-	Apigw1Configurator   Apigw1Configurator
-	SnsConfigurator      SnsConfigurator
-	SqsConfigurator      SqsConfigurator
-	S3Configurator       S3Configurator
-	KinesisConfigurator  KinesisConfigurator
-	DynamodbConfigurator DynamodbConfigurator
-	Features             Features
-}
 
 type KinesisRouterBeforeRecordsFunc func(event events.KinesisEvent, ctx context.Context) error
 type KinesisRouterBeforeRecordFunc func(info KinesisRecordInfo) (KinesisRecordInfo, error)
