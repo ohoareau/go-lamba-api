@@ -43,6 +43,12 @@ func applyHttpFeatures(r *common.HttpRouter, f common.Features) {
 
 	// these features add routes and must be executed after all the features that add middlewares
 
+	if f["robots"] {
+		features.Robots(r)
+	}
+	if f["sitemap"] {
+		features.Sitemap(r)
+	}
 	if f["root"] {
 		features.Root(r)
 	}
