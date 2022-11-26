@@ -9,6 +9,10 @@ import (
 func CreateHttpRouter(options *common.Options) *common.HttpRouter {
 	r := chi.NewRouter()
 
+	if nil != options.HttpRouterConfigurator {
+		options.HttpRouterConfigurator(r)
+	}
+
 	applyHttpFeatures(r, options.Features)
 
 	if nil != options.Apigw2Configurator {
@@ -18,10 +22,6 @@ func CreateHttpRouter(options *common.Options) *common.HttpRouter {
 		options.Apigw1Configurator(r)
 	}
 
-	if nil != options.HttpRouterConfigurator {
-		options.HttpRouterConfigurator(r)
-	}
-	
 	return r
 }
 
