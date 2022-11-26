@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -19,6 +20,8 @@ type SnsRouter interface{}
 type S3Router interface{}
 type DynamodbRouter interface{}
 
+type HandlerWrapper func(h lambda.Handler) lambda.Handler
+
 type Options struct {
 	Apigw2Configurator   Apigw2Configurator
 	Apigw1Configurator   Apigw1Configurator
@@ -28,4 +31,5 @@ type Options struct {
 	KinesisConfigurator  KinesisConfigurator
 	DynamodbConfigurator DynamodbConfigurator
 	Features             Features
+	HandlerWrapper       *HandlerWrapper
 }

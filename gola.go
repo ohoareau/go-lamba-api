@@ -22,5 +22,11 @@ func Main(options common.Options) {
 		os.Exit(0)
 	}
 
-	runtime.StartHandler(services.CreateHandler(&options))
+	h := services.CreateHandler(&options)
+
+	if nil != options.HandlerWrapper {
+		h = (*options.HandlerWrapper)(h)
+	}
+
+	runtime.StartHandler(h)
 }
