@@ -6,11 +6,15 @@ import (
 	"github.com/ohoareau/gola/features"
 )
 
-func CreateHttpRouter(options *common.Options) *common.HttpRouter {
+func CreateHttpRouter(options *common.Options, local bool) *common.HttpRouter {
 	r := chi.NewRouter()
 
 	if nil != options.HttpRouterConfigurator {
 		options.HttpRouterConfigurator(r)
+	}
+
+	if local && nil != options.LocalHttpRouterConfigurator {
+		options.LocalHttpRouterConfigurator(r)
 	}
 
 	applyHttpFeatures(r, options.Features)

@@ -30,7 +30,7 @@ func ConvertPayloadToApiGatewayV1Event(payload []byte) events.APIGatewayProxyReq
 
 //goland:noinspection GoUnusedParameter
 func HandleApiGatewayV2Event(event events.APIGatewayV2HTTPRequest, ctx context.Context, options *common.Options) (events.APIGatewayV2HTTPResponse, error) {
-	return adapters.CreateChiAdapter(CreateHttpRouter(options)).ProxyWithContext(ctx, event)
+	return adapters.CreateChiAdapter(CreateHttpRouter(options, false)).ProxyWithContext(ctx, event)
 }
 
 //goland:noinspection GoUnusedParameter
