@@ -31,5 +31,5 @@ type Options struct {
 	KinesisConfigurator  KinesisConfigurator
 	DynamodbConfigurator DynamodbConfigurator
 	Features             Features
-	HandlerWrapper       *HandlerWrapper
+	HandlerWrapper       HandlerWrapper
 }
