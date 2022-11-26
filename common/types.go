@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+type HttpRouterConfigurator func(r *HttpRouter)
 type Apigw2Configurator func(r *HttpRouter)
 type Apigw1Configurator func(r *HttpRouter)
 type SnsConfigurator func(r *SnsRouter)
@@ -23,13 +24,14 @@ type DynamodbRouter interface{}
 type HandlerWrapper func(h lambda.Handler) lambda.Handler
 
 type Options struct {
-	Apigw2Configurator   Apigw2Configurator
-	Apigw1Configurator   Apigw1Configurator
-	SnsConfigurator      SnsConfigurator
-	SqsConfigurator      SqsConfigurator
-	S3Configurator       S3Configurator
-	KinesisConfigurator  KinesisConfigurator
-	DynamodbConfigurator DynamodbConfigurator
-	Features             Features
-	HandlerWrapper       HandlerWrapper
+	HttpRouterConfigurator HttpRouterConfigurator
+	Apigw2Configurator     Apigw2Configurator
+	Apigw1Configurator     Apigw1Configurator
+	SnsConfigurator        SnsConfigurator
+	SqsConfigurator        SqsConfigurator
+	S3Configurator         S3Configurator
+	KinesisConfigurator    KinesisConfigurator
+	DynamodbConfigurator   DynamodbConfigurator
+	Features               Features
+	HandlerWrapper         HandlerWrapper
 }

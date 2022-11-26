@@ -18,6 +18,10 @@ func CreateHttpRouter(options *common.Options) *common.HttpRouter {
 		options.Apigw1Configurator(r)
 	}
 
+	if nil != options.HttpRouterConfigurator {
+		options.HttpRouterConfigurator(r)
+	}
+	
 	return r
 }
 
